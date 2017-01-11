@@ -225,7 +225,7 @@ toVector :: (Vector v a) => GenRope l v a -> v a
 toVector = V.concat . F.toList . fromGenRope
 
 
--- | /O(1)/ First element and the remainder of the rope
+-- | /(O(c), optimal O(1))/ First element and the remainder of the rope
 
 uncons :: (Measured l (v a), Vector v a) => GenRope l v a -> Maybe (a, GenRope l v a)
 uncons = go . viewl . fromGenRope
@@ -236,7 +236,7 @@ uncons = go . viewl . fromGenRope
         | otherwise = Just (V.head xs, GenRope (V.tail xs <| xss))
 
 
--- | /O(1)/ First element and the remainder of the rope
+-- | /(O(c), optimal O(1))/ First element and the remainder of the rope
 
 unsnoc :: (Measured l (v a), Vector v a) => GenRope l v a -> Maybe (GenRope l v a, a)
 unsnoc = go . viewr . fromGenRope
