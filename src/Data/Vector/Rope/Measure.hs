@@ -25,9 +25,9 @@ import Foreign.Storable (Storable)
 
 -- | Class for finger tree measures that include length information
 
-class (Monoid v) => HasLength v where
+class (Monoid l) => HasLength l where
     -- | Extract length
-    lengthMeasure :: v -> Length
+    lengthMeasure :: l -> Length
 
 
 -- | Length measure for vectors
