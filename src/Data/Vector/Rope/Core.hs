@@ -21,6 +21,7 @@ module Data.Vector.Rope.Core
       -- * Construction
       concatMap,
       empty,
+      singleton,
 
       -- * Query
       (!),
@@ -248,6 +249,12 @@ length = lengthMeasure . measure . fromGenRope
 
 null :: (HasLength l, Measured l (v a)) => GenRope l v a -> Bool
 null = (0 ==) . length
+
+
+-- | /O(1)/ Singleton rope
+
+singleton :: (Measured l (v a), Vector v a) => a -> GenRope l v a
+singleton = GenRope . Ft.singleton . V.singleton
 
 
 -- | /(O(c), optimal O(1))/ All but first element, throws if empty
