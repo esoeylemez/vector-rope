@@ -36,6 +36,9 @@ newtype Length = Length { fromLength :: Int }
     deriving (Bounded, Enum, Eq, Integral, Num, Ord,
               Real, Show)
 
+instance HasLength Length where
+    lengthMeasure = id
+
 instance Measured Length (Vb.Vector a) where
     measure = Length . V.length
 
