@@ -15,20 +15,17 @@ import Test.Tasty
 import Test.Tasty.QuickCheck
 
 
-eqEq (EqRopes xs ys) = xs == ys && ys == xs
+eqEq (EqRopes xs ys) =
+    xs == ys && ys == xs
 
+eqNEq (R xs) (R ys) =
+    R.toVector xs /= R.toVector ys ==> xs /= ys
 
-eqNEq :: R.RopeU Int -> R.RopeU Int -> Property
-eqNEq xs ys = R.toVector xs /= R.toVector ys ==> xs /= ys
-
-
-eqCompare :: R.RopeU Int -> R.RopeU Int -> Bool
-eqCompare xs ys =
+eqCompare (R xs) (R ys) =
     compare (R.toVector xs) (R.toVector ys) ==
     compare xs ys
 
 
-eqOrdProps :: TestTree
 eqOrdProps =
     testGroup "EqOrd" $
         testProperty "==" eqEq :

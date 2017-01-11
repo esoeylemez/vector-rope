@@ -7,7 +7,8 @@
 
 module RopeGen
     ( -- * Rope generators
-      EqRopes(..)
+      EqRopes(..),
+      RopeGen(..)
     )
     where
 
@@ -42,6 +43,19 @@ instance Show EqRopes where
             showList (map V.toList (toList xs)) .
             showChar ' ' .
             showList (map V.toList (toList ys))
+
+
+-- | Generates ropes
+
+newtype RopeGen = R { fromRopeGen :: R.RopeU Int }
+    deriving (Eq, Ord)
+
+instance Arbitrary RopeGen where
+    arbitrary = R <$> arbitrary
+    shrink = map R . shrink . fromRopeGen
+
+instance Show RopeGen where
+    showsPrec d = showsPrec d . fromRopeGen
 
 
 -- | Orphan instance to generate ropes
