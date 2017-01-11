@@ -20,6 +20,10 @@ module Data.Vector.Rope.Core
       empty,
 
       -- * Query
+      (!),
+      (!?),
+      index,
+      indexMaybe,
       length,
       null,
 
@@ -130,6 +134,19 @@ compareBy cmp lt gt (GenRope xss0) (GenRope yss0) =
         ylen = V.length ys
 
 
+-- | /O(log c)/ Element at the given position, partial version of @('!?')@
+
+(!) :: (HasLength l, Measured l (v a), Vector v a) => GenRope l v a -> Int -> a
+(!) = flip index
+
+
+-- | /O(log c)/ Element at the given position, 'Nothing' if out of
+-- bounds
+
+(!?) :: (HasLength l, Measured l (v a), Vector v a) => GenRope l v a -> Int -> Maybe a
+(!?) = flip indexMaybe
+
+
 -- | /O(1)/ Empty rope
 
 empty :: (Measured l (v a)) => GenRope l v a
@@ -152,6 +169,25 @@ fromList = fromVector . V.fromList . F.toList
 
 fromVector :: (Measured l (v a)) => v a -> GenRope l v a
 fromVector = GenRope . Ft.singleton
+
+
+-- | /O(log c)/ Element at the given position, partial version of 'indexMaybe'
+
+index :: (HasLength l, Measured l (v a), Vector v a) => Int -> GenRope l v a -> a
+index n =
+    maybe (error "index: Out of bounds") id .
+    indexMaybe n
+
+
+-- | /O(log c)/ Element at the given position, 'Nothing' if out of
+-- bounds
+
+indexMaybe :: (HasLength l, Measured l (v a), Vector v a) => Int -> GenRope l v a -> Maybe a
+indexMaybe n (GenRope xss) =
+    let (xss1, xss2) = Ft.split ((> n) . lengthMeasure) xss
+    in case viewl xss2 of
+         EmptyL  -> Nothing
+         xs :< _ -> xs V.!? (n - lengthMeasure (measure xss1))
 
 
 -- | /O(1)/ Length of the given rope

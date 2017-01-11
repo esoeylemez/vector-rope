@@ -18,5 +18,6 @@ import Test.Tasty.QuickCheck
 
 queryProps =
     testGroup "query" $
+        testProperty "indexMaybe" (\n -> matchVec1 (R.indexMaybe n) (V.!? n)) :
         testProperty "length" (matchVec1 R.length V.length) :
         []
