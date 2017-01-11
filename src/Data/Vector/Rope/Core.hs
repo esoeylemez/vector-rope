@@ -157,7 +157,7 @@ fromVector = GenRope . Ft.singleton
 -- | /O(1)/ Length of the given rope
 
 length :: (HasLength l, Measured l (v a)) => GenRope l v a -> Int
-length = fromLength . lengthMeasure . measure . fromGenRope
+length = lengthMeasure . measure . fromGenRope
 
 
 -- | /O(1)/ Whether the given rope is empty

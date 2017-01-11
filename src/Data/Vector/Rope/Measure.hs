@@ -27,7 +27,7 @@ import Foreign.Storable (Storable)
 
 class (Monoid l) => HasLength l where
     -- | Extract length
-    lengthMeasure :: l -> Length
+    lengthMeasure :: l -> Int
 
 
 -- | Length measure for vectors
@@ -37,7 +37,7 @@ newtype Length = Length { fromLength :: Int }
               Real, Show)
 
 instance HasLength Length where
-    lengthMeasure = id
+    lengthMeasure = fromLength
 
 instance Measured Length (Vb.Vector a) where
     measure = Length . V.length
