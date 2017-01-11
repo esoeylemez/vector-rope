@@ -88,6 +88,9 @@ instance (Eq a, Measured l (v a), Vector v a) => Eq (GenRope l v a) where
                   xss
                   yss
 
+instance Foldable (GenRope Length Vb.Vector) where
+    foldMap f = foldMap f . toList
+
 instance Functor (GenRope Length Vb.Vector) where
     fmap f = GenRope . Ft.fmap' (fmap f) . fromGenRope
 
