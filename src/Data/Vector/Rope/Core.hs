@@ -76,6 +76,10 @@ instance (Eq a, Measured l (v a), Vector v a) => Eq (GenRope l v a) where
                   xss
                   yss
 
+instance (Measured l (v a)) => Monoid (GenRope l v a) where
+    mappend (GenRope xs) (GenRope ys) = GenRope (xs <> ys)
+    mempty = empty
+
 instance (Ord a, Measured l (v a), Vector v a) => Ord (GenRope l v a) where
     compare = compareBy V.cmp LT GT
 
