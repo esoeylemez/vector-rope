@@ -8,7 +8,11 @@
 module RopeGen
     ( -- * Rope generators
       EqRopes(..),
-      RopeGen(..)
+      RopeGen(..),
+
+      -- * Helper functions
+      matchVec1,
+      matchVec2
     )
     where
 
@@ -17,6 +21,7 @@ import Data.Foldable
 import Data.Vector.Generic (Vector)
 import qualified Data.Vector.Generic as V
 import qualified Data.Vector.Rope.Core as R
+import qualified Data.Vector.Unboxed as Vu
 import Test.QuickCheck
 
 
@@ -88,3 +93,30 @@ chunk xs0 = go xs0
         n <- choose (0, maxN)
         let (ys, xs) = V.splitAt n xs'
         fmap (ys :) (go xs)
+
+
+-- | Make sure that the result of a function matches the result of the
+-- equivalent vector function
+
+matchVec1
+    :: (Eq a)
+    => (R.RopeU Int -> a)
+    -> (Vu.Vector Int -> a)
+    -> R.RopeU Int
+    -> Bool
+matchVec1 fr fv xs =
+    fr xs == fv (R.toVector xs)
+
+
+-- | Make sure that the result of a binary function matches the result
+-- of the equivalent vector function
+
+matchVec2
+    :: (Eq a)
+    => (R.RopeU Int -> R.RopeU Int -> a)
+    -> (Vu.Vector Int -> Vu.Vector Int -> a)
+    -> R.RopeU Int
+    -> R.RopeU Int
+    -> Bool
+matchVec2 fr fv xs ys =
+    fr xs ys == fv (R.toVector xs) (R.toVector ys)

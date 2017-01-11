@@ -21,14 +21,10 @@ eqEq (EqRopes xs ys) =
 eqNEq (R xs) (R ys) =
     R.toVector xs /= R.toVector ys ==> xs /= ys
 
-eqCompare (R xs) (R ys) =
-    compare (R.toVector xs) (R.toVector ys) ==
-    compare xs ys
-
 
 eqOrdProps =
     testGroup "EqOrd" $
         testProperty "==" eqEq :
         testProperty "/=" eqNEq :
-        testProperty "compare" eqCompare :
+        testProperty "compare" (matchVec2 compare compare) :
         []
