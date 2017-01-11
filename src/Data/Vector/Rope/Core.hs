@@ -2,6 +2,9 @@
 -- Copyright:  (c) 2016 Ertugrul Söylemez
 -- License:    BSD3
 -- Maintainer: Ertugrul Söylemez <esz@posteo.de>
+--
+-- In big-O complexity annotations variables starting with /c/ represent
+-- the number of chunks and /n/ the number of individual elements.
 
 module Data.Vector.Rope.Core
     ( -- * Ropes
@@ -92,7 +95,7 @@ type RopeS = Rope Vs.Vector
 type RopeU = Rope Vu.Vector
 
 
--- | Compare the given two ropes using the given monoid
+-- | /O(min n1 n2)/ Compare the given two ropes using the given monoid
 
 compareBy
     :: (Measured l (v a), Monoid o, Vector v a)
@@ -123,43 +126,44 @@ compareBy cmp lt gt (GenRope xss0) (GenRope yss0) =
         ylen = V.length ys
 
 
--- | Empty rope
+-- | /O(1)/ Empty rope
 
 empty :: (Measured l (v a)) => GenRope l v a
 empty = GenRope Ft.empty
 
 
--- | Construct a rope from the given list of chunks
+-- | /O(c)/ Construct a rope from the given list of chunks
 
 fromChunks :: (Foldable f, Measured l (v a)) => f (v a) -> GenRope l v a
 fromChunks = GenRope . Ft.fromList . F.toList
 
 
--- | Construct a rope from a list
+-- | /O(n)/ Construct a rope from a list
 
 fromList :: (Foldable f, Measured l (v a), Vector v a) => f a -> GenRope l v a
 fromList = fromVector . V.fromList . F.toList
 
 
--- | Construct a rope from a single chunk
+-- | /O(1)/ Construct a rope from a single chunk
 
 fromVector :: (Measured l (v a)) => v a -> GenRope l v a
 fromVector = GenRope . Ft.singleton
 
 
--- | Extract the list of chunks from the given rope
+-- | /(O(c) full, O(1) per head)/ Extract the list of chunks from the
+-- given rope
 
 toChunks :: GenRope l v a -> [v a]
 toChunks = F.toList . fromGenRope
 
 
--- | Convert the given rope into a list
+-- | /(O(n) full, O(1) per head)/ Convert the given rope into a list
 
 toList :: (Vector v a) => GenRope l v a -> [a]
 toList = concatMap V.toList . fromGenRope
 
 
--- | Convert the given rope into a vector
+-- | /O(n)/ Convert the given rope into a vector
 
 toVector :: (Vector v a) => GenRope l v a -> v a
 toVector = V.concat . F.toList . fromGenRope
