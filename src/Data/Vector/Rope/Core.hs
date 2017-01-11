@@ -8,6 +8,7 @@
 -- an "optimal" complexity is annotated, it means the complexity under
 -- the assumption that all chunks are non-empty.
 
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module Data.Vector.Rope.Core
@@ -54,6 +55,7 @@ import Data.FingerTree (FingerTree, Measured(..), ViewL(..), ViewR(..), (<|), (|
 import qualified Data.FingerTree as Ft
 import qualified Data.Foldable as F
 import Data.Monoid
+import Data.String
 import qualified Data.Vector as Vb
 import Data.Vector.Generic (Vector)
 import qualified Data.Vector.Generic as V
@@ -88,6 +90,9 @@ instance (Eq a, Measured l (v a), Vector v a) => Eq (GenRope l v a) where
 
 instance Functor (GenRope Length Vb.Vector) where
     fmap f = GenRope . Ft.fmap' (fmap f) . fromGenRope
+
+instance (Measured l (v Char), Vector v Char) => IsString (GenRope l v Char) where
+    fromString = fromList
 
 instance Monad (GenRope Length Vb.Vector) where
     (>>=) = flip concatMap
