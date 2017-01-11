@@ -4,7 +4,9 @@
 -- Maintainer: Ertugrul Söylemez <esz@posteo.de>
 --
 -- In big-O complexity annotations variables starting with /c/ represent
--- the number of chunks and /n/ the number of individual elements.
+-- the number of chunks and /n/ the number of individual elements.  If
+-- an "optimal" complexity is annotated, it means the complexity under
+-- the assumption that all chunks are non-empty.
 
 module Data.Vector.Rope.Core
     ( -- * Ropes
@@ -26,6 +28,8 @@ module Data.Vector.Rope.Core
       indexMaybe,
       length,
       null,
+      uncons,
+      unsnoc,
 
       -- * Conversion
       fromChunks,
@@ -37,7 +41,7 @@ module Data.Vector.Rope.Core
     )
     where
 
-import Data.FingerTree (FingerTree, Measured(..), ViewL(..), viewl)
+import Data.FingerTree (FingerTree, Measured(..), ViewL(..), ViewR(..), (<|), (|>), viewl, viewr)
 import qualified Data.FingerTree as Ft
 import qualified Data.Foldable as F
 import Data.Monoid
@@ -219,3 +223,25 @@ toList = concatMap V.toList . fromGenRope
 
 toVector :: (Vector v a) => GenRope l v a -> v a
 toVector = V.concat . F.toList . fromGenRope
+
+
+-- | /O(1)/ First element and the remainder of the rope
+
+uncons :: (Measured l (v a), Vector v a) => GenRope l v a -> Maybe (a, GenRope l v a)
+uncons = go . viewl . fromGenRope
+    where
+    go EmptyL      = Nothing
+    go (xs :< xss)
+        | V.null xs = go (viewl xss)
+        | otherwise = Just (V.head xs, GenRope (V.tail xs <| xss))
+
+
+-- | /O(1)/ First element and the remainder of the rope
+
+unsnoc :: (Measured l (v a), Vector v a) => GenRope l v a -> Maybe (GenRope l v a, a)
+unsnoc = go . viewr . fromGenRope
+    where
+    go EmptyR      = Nothing
+    go (xss :> xs)
+        | V.null xs = go (viewr xss)
+        | otherwise = Just (GenRope (xss |> V.init xs), V.last xs)
