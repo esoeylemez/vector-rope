@@ -24,10 +24,14 @@ module Data.Vector.Rope.Core
       -- * Query
       (!),
       (!?),
+      head,
       index,
       indexMaybe,
+      init,
+      last,
       length,
       null,
+      tail,
       uncons,
       unsnoc,
 
@@ -52,7 +56,7 @@ import qualified Data.Vector.Primitive as Vp
 import Data.Vector.Rope.Measure
 import qualified Data.Vector.Storable as Vs
 import qualified Data.Vector.Unboxed as Vu
-import Prelude hiding (length, null)
+import Prelude hiding (head, init, last, length, null, tail)
 
 
 -- | Ropes are vectors using a chunked encoding based on finger-trees to
@@ -175,6 +179,14 @@ fromVector :: (Measured l (v a)) => v a -> GenRope l v a
 fromVector = GenRope . Ft.singleton
 
 
+-- | /(O(c), optimal O(1))/ First element, throws if empty
+
+head :: (Measured l (v a), Vector v a) => GenRope l v a -> a
+head =
+    maybe (error "head: Empty rope") fst .
+    uncons
+
+
 -- | /O(log c)/ Element at the given position, partial version of 'indexMaybe'
 
 index :: (HasLength l, Measured l (v a), Vector v a) => Int -> GenRope l v a -> a
@@ -194,6 +206,22 @@ indexMaybe n (GenRope xss) =
          xs :< _ -> xs V.!? (n - lengthMeasure (measure xss1))
 
 
+-- | /(O(c), optimal O(1))/ All but last element, throws if empty
+
+init :: (Measured l (v a), Vector v a) => GenRope l v a -> GenRope l v a
+init =
+    maybe (error "init: Empty rope") fst .
+    unsnoc
+
+
+-- | /(O(c), optimal O(1))/ Last element, throws if empty
+
+last :: (Measured l (v a), Vector v a) => GenRope l v a -> a
+last =
+    maybe (error "last: Empty rope") snd .
+    unsnoc
+
+
 -- | /O(1)/ Length of the given rope
 
 length :: (HasLength l, Measured l (v a)) => GenRope l v a -> Int
@@ -204,6 +232,14 @@ length = lengthMeasure . measure . fromGenRope
 
 null :: (HasLength l, Measured l (v a)) => GenRope l v a -> Bool
 null = (0 ==) . length
+
+
+-- | /(O(c), optimal O(1))/ All but first element, throws if empty
+
+tail :: (Measured l (v a), Vector v a) => GenRope l v a -> GenRope l v a
+tail =
+    maybe (error "tail: Empty rope") snd .
+    uncons
 
 
 -- | /(O(c) full, O(1) per head)/ Extract the list of chunks from the
