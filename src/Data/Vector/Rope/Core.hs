@@ -19,6 +19,7 @@ module Data.Vector.Rope.Core
       RopeU,
 
       -- * Construction
+      concatMap,
       empty,
 
       -- * Query
@@ -56,7 +57,8 @@ import qualified Data.Vector.Primitive as Vp
 import Data.Vector.Rope.Measure
 import qualified Data.Vector.Storable as Vs
 import qualified Data.Vector.Unboxed as Vu
-import Prelude hiding (head, init, last, length, null, tail)
+import qualified Prelude as P
+import Prelude hiding (concatMap, head, init, last, length, null, tail)
 
 
 -- | Ropes are vectors using a chunked encoding based on finger-trees to
@@ -87,7 +89,7 @@ instance (Show a, Vector v a) => Show (GenRope l v a) where
     showsPrec d (GenRope xs) =
         showParen (d > 10) $
             showString "fromList " .
-            (showList . concatMap V.toList . F.toList) xs
+            (showList . P.concatMap V.toList . F.toList) xs
 
 
 -- | Ropes that only maintain length
@@ -157,6 +159,16 @@ compareBy cmp lt gt (GenRope xss0) (GenRope yss0) =
 
 (!?) :: (HasLength l, Measured l (v a), Vector v a) => GenRope l v a -> Int -> Maybe a
 (!?) = flip indexMaybe
+
+
+-- | /O(n)/ Map the given function and concatenate the results
+
+concatMap
+    :: (Measured l (v b), Vector v' a)
+    => (a -> GenRope l v b)
+    -> GenRope l' v' a
+    -> GenRope l v b
+concatMap f = foldMap f . toList
 
 
 -- | /O(1)/ Empty rope
@@ -256,7 +268,7 @@ toChunks = F.toList . fromGenRope
 -- | /(O(n) full, O(1) per head)/ Convert the given rope into a list
 
 toList :: (Vector v a) => GenRope l v a -> [a]
-toList = concatMap V.toList . fromGenRope
+toList = P.concatMap V.toList . fromGenRope
 
 
 -- | /O(n)/ Convert the given rope into a vector
