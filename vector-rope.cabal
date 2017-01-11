@@ -1,7 +1,7 @@
 name:     vector-rope
 version:  0.1.0
-category: 
-synopsis: 
+category: Data, Data Structures
+synopsis: Vectors with efficient appends and updates
 
 maintainer:   Ertugrul Söylemez <esz@posteo.de>
 author:       Ertugrul Söylemez <esz@posteo.de>
@@ -11,7 +11,10 @@ bug-reports:  https://github.com/esoeylemez/vector-rope/issues
 license:      BSD3
 license-file: LICENSE
 
-description: 
+description: This package provides an implementation of ropes with
+    vector chunks, so operations like appending and random updates
+    become efficient.  This is often a good functional replacement for
+    mutable vectors.
 
 build-type:         Simple
 cabal-version:      >= 1.10
@@ -21,57 +24,35 @@ source-repository head
     type:     git
     location: https://github.com/esoeylemez/vector-rope.git
 
-flag Devel
-    default: False
-    description: Development dependencies
-    manual: True
-
-flag Examples
-    default: False
-    description: Build the example programs
-    manual: True
-
 
 library
     build-depends:
-        base >= 4.8 && < 4.10
-    if flag(devel)
-        build-depends: rapid
+        base >= 4.8 && < 4.10,
+        fingertree == 0.1.*,
+        primitive == 0.6.*,
+        vector >= 0.11 && < 0.13
     default-language: Haskell2010
     ghc-options: -W
     hs-source-dirs: src
     exposed-modules:
-
-executable vector-rope
-    build-depends:
-        base >= 4.8 && < 4.10,
-        vector-rope
-    default-language: Haskell2010
-    ghc-options: -W -threaded
-    hs-source-dirs: programs
-    main-is: vector-rope.hs
-
-executable vector-rope-experiment
-    if flag(examples)
-        build-depends:
-            base >= 4.8 && < 4.10,
-            vector-rope
-    else
-        buildable: False
-    default-language: Haskell2010
-    ghc-options: -W -threaded
-    hs-source-dirs: examples
-    main-is: experiment.hs
+        Data.Vector.Rope
+        Data.Vector.Rope.Core
+        Data.Vector.Rope.Measure
 
 test-suite tests
     type: exitcode-stdio-1.0
     build-depends:
         base >= 4.8 && < 4.10,
+        fingertree,
         QuickCheck,
         tasty,
         tasty-quickcheck,
+        vector,
         vector-rope
     default-language: Haskell2010
     ghc-options: -W -threaded -with-rtsopts=-N
     hs-source-dirs: tests
     main-is: Props.hs
+    other-modules:
+        Props.EqOrd
+        RopeGen

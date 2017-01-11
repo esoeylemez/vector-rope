@@ -6,13 +6,12 @@
 
 module Main (main) where
 
+import Props.EqOrd
 import Test.Tasty
 
 
-subgroups :: [TestTree]
-subgroups =
-    []
-
-
 main :: IO ()
-main = defaultMain (testGroup "all" subgroups)
+main =
+    defaultMain . testGroup "GenRope" $
+        eqOrdProps :
+        []
