@@ -7,6 +7,7 @@
 module Main (main) where
 
 import Props.EqOrd
+import Props.Query
 import Test.Tasty
 
 
@@ -14,4 +15,5 @@ main :: IO ()
 main =
     defaultMain . testGroup "GenRope" $
         eqOrdProps :
+        queryProps :
         []

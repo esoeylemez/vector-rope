@@ -55,4 +55,5 @@ test-suite tests
     main-is: Props.hs
     other-modules:
         Props.EqOrd
+        Props.Query
         RopeGen
