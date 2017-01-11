@@ -19,6 +19,10 @@ module Data.Vector.Rope.Core
       -- * Construction
       empty,
 
+      -- * Query
+      length,
+      null,
+
       -- * Conversion
       fromChunks,
       fromList,
@@ -29,7 +33,7 @@ module Data.Vector.Rope.Core
     )
     where
 
-import Data.FingerTree (FingerTree, Measured, ViewL(..), viewl)
+import Data.FingerTree (FingerTree, Measured(..), ViewL(..), viewl)
 import qualified Data.FingerTree as Ft
 import qualified Data.Foldable as F
 import Data.Monoid
@@ -40,7 +44,7 @@ import qualified Data.Vector.Primitive as Vp
 import Data.Vector.Rope.Measure
 import qualified Data.Vector.Storable as Vs
 import qualified Data.Vector.Unboxed as Vu
-import Prelude hiding (length)
+import Prelude hiding (length, null)
 
 
 -- | Ropes are vectors using a chunked encoding based on finger-trees to
@@ -148,6 +152,18 @@ fromList = fromVector . V.fromList . F.toList
 
 fromVector :: (Measured l (v a)) => v a -> GenRope l v a
 fromVector = GenRope . Ft.singleton
+
+
+-- | /O(1)/ Length of the given rope
+
+length :: (HasLength l, Measured l (v a)) => GenRope l v a -> Int
+length = fromLength . lengthMeasure . measure . fromGenRope
+
+
+-- | /O(1)/ Whether the given rope is empty
+
+null :: (HasLength l, Measured l (v a)) => GenRope l v a -> Bool
+null = (0 ==) . length
 
 
 -- | /(O(c) full, O(1) per head)/ Extract the list of chunks from the
