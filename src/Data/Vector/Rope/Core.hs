@@ -113,6 +113,13 @@ instance (Show a, Vector v a) => Show (GenRope l v a) where
             showString "fromList " .
             (showList . P.concatMap V.toList . F.toList) xs
 
+instance Traversable (GenRope Length Vb.Vector) where
+    traverse f =
+        fmap (GenRope . Ft.fromList) .
+        traverse (traverse f) .
+        F.toList .
+        fromGenRope
+
 
 -- | Ropes that only maintain length
 
